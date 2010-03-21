@@ -68,8 +68,12 @@ class TypusGenerator < Rails::Generator::Base
         # - Form
         #
 
-        list_rejections = %w( id created_at created_on updated_at updated_on salt crypted_password )
-        form_rejections = list_rejections + %w( position )
+        rejections = %w( id created_at created_on updated_at updated_on 
+                         salt crypted_password 
+                         password_salt persistence_token single_access_token perishable_token )
+
+        list_rejections = rejections + %w( password password_confirmation )
+        form_rejections = rejections + %w( position )
 
         list = model_columns.reject { |c| c.sql_type == "text" || list_rejections.include?(c.name) }.map(&:name)
         form = model_columns.reject { |c| form_rejections.include?(c.name) }.map(&:name)
@@ -244,13 +248,13 @@ class TypusGenerator < Rails::Generator::Base
     opt.separator "Options:"
 
     opt.on("-u", "--typus_user=Class", String,
-           "Configure Typus User class name. Default is `#{options[:user_class_name]}`.") { |v| options[:user_class_name] = v }
+           "Configure Typus User class name. Default is `#{default_options[:user_class_name]}`.") { |v| options[:user_class_name] = v }
 
     opt.on("-a", "--app_name=ApplicationName", String,
-           "Set an application name. Default is `#{options[:app_name]}`.") { |v| options[:app_name] = v }
+           "Set an application name. Default is `#{default_options[:app_name]}`.") { |v| options[:app_name] = v }
 
     opt.on("-k", "--user_fk=UserFK", String,
-           "Configure Typus User foreign key field. Default is `#{options[:user_fk]}`.") { |v| options[:user_fk] = v }
+           "Configure Typus User foreign key field. Default is `#{default_options[:user_fk]}`.") { |v| options[:user_fk] = v }
 
   end
 
