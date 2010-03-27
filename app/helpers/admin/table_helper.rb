@@ -128,6 +128,7 @@ module Admin::TableHelper
 
               end
 
+    headers << "&nbsp;" if @current_user.can?('edit', model)
     headers << "&nbsp;" if @current_user.can?('delete', model)
 
     render "admin/helpers/table_header", 
