@@ -165,7 +165,7 @@ module Admin::FormHelper
 <a name="#{field}"></a>
 <div class="box_relationships" id="#{model_to_relate_as_resource}">
   <h2>
-  #{link_to model_to_relate.typus_human_name.pluralize, { :controller => "admin/#{model_to_relate_as_resource}", foreign_key => @item.id }, :title => _("{{model}} filtered by {{filtered_by}}", :model => model_to_relate.typus_human_name.pluralize, :filtered_by => @item.to_label)}
+  #{link_to field.humanize, { :controller => "admin/#{model_to_relate_as_resource}", foreign_key => @item.id }, :title => _("{{model}} filtered by {{filtered_by}}", :model => model_to_relate.typus_human_name.pluralize, :filtered_by => @item.to_label)}
   #{add_new}
   </h2>
       HTML
@@ -179,6 +179,7 @@ module Admin::FormHelper
         html << <<-HTML
   #{form_tag :action => 'relate', :id => @item.id}
   #{hidden_field :related, :model, :value => model_to_relate}
+  #{hidden_field :related, :field, :value => field}
   <p>#{select :related, :id, items_to_relate.collect { |f| [f.to_label, f.id] }.sort_by { |e| e.first } } &nbsp; #{submit_tag _("Add"), :class => 'button'}</p>
   </form>
         HTML
