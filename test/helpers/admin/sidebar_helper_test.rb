@@ -163,8 +163,9 @@ class Admin::SidebarHelperTest < ActiveSupport::TestCase
                                     %Q[<input id="controller" name="controller" type="hidden" value="admin/typus_users" />] ], 
                 :search_by => "First name, Last name, Email, and Role" }
 
-    assert_equal [ partial, options ], output
-
+    assert_equal partial, output[0]
+    assert (options[:hidden_params] - output[1][:hidden_params]).length == 0
+    assert_equal options[:search_by], output[1][:search_by]
   end
 
   def test_filters

@@ -16,8 +16,6 @@ class Admin::TableHelperTest < ActiveSupport::TestCase
   # FIXME
   def test_build_typus_table
 
-    return
-
     @current_user = typus_users(:admin)
 
     params = { :controller => 'admin/typus_users', :action => 'index' }
@@ -26,23 +24,23 @@ class Admin::TableHelperTest < ActiveSupport::TestCase
     fields = TypusUser.typus_fields_for(:list)
     items = TypusUser.find(:all)
 
-    output = build_typus_table(TypusUser, fields, items)
-    expected = <<-HTML
-<tr>
-<th><a href="http://test.host/admin/typus_users?order_by=email">Email </a></th>
-<th><a href="http://test.host/admin/typus_users?order_by=role">Role </a></th>
-<th><a href="http://test.host/admin/typus_users?order_by=status">Status </a></th>
-<th>&nbsp;</th>
-</tr>
-    HTML
+    expects(:render).once.with('admin/helpers/table_header', 
+      { :headers => [
+        '<a href="http://test.host/admin/typus_users?order_by=email">Email </a>', 
+        '<a href="http://test.host/admin/typus_users?order_by=role">Role </a>', 
+        '<a href="http://test.host/admin/typus_users?order_by=status">Status </a>', 
+        '&nbsp;', 
+        '&nbsp;'
+    ]})
 
-    assert_equal expected, output
+    build_typus_table(TypusUser, fields, items)
 
   end
 
   def test_typus_table_header
 
     @current_user = mock()
+    @current_user.expects(:can?).with('edit', TypusUser).returns(true)
     @current_user.expects(:can?).with('delete', TypusUser).returns(true)
 
     fields = TypusUser.typus_fields_for(:list)
@@ -50,23 +48,23 @@ class Admin::TableHelperTest < ActiveSupport::TestCase
     params = { :controller => 'admin/typus_users', :action => 'index' }
     self.expects(:params).at_least_once.returns(params)
 
-    output = typus_table_header(TypusUser, fields)
-    expected = <<-HTML
-<tr>
-<th><a href="http://test.host/admin/typus_users?order_by=email">Email </a></th>
-<th><a href="http://test.host/admin/typus_users?order_by=role">Role </a></th>
-<th><a href="http://test.host/admin/typus_users?order_by=status">Status </a></th>
-<th>&nbsp;</th>
-</tr>
-    HTML
+    expects(:render).once.with('admin/helpers/table_header', 
+      { :headers => [
+        '<a href="http://test.host/admin/typus_users?order_by=email">Email </a>', 
+        '<a href="http://test.host/admin/typus_users?order_by=role">Role </a>', 
+        '<a href="http://test.host/admin/typus_users?order_by=status">Status </a>', 
+        '&nbsp;', 
+        '&nbsp;'
+    ]})
 
-    assert_equal expected, output
+    typus_table_header(TypusUser, fields)
 
   end
 
   def test_typus_table_header_with_params
 
     @current_user = mock()
+    @current_user.expects(:can?).with('edit', TypusUser).returns(true)
     @current_user.expects(:can?).with('delete', TypusUser).returns(true)
 
     fields = TypusUser.typus_fields_for(:list)
@@ -74,23 +72,46 @@ class Admin::TableHelperTest < ActiveSupport::TestCase
     params = { :controller => 'admin/typus_users', :action => 'index', :search => 'admin' }
     self.expects(:params).at_least_once.returns(params)
 
-    output = typus_table_header(TypusUser, fields)
-    expected = <<-HTML
-<tr>
-<th><a href="http://test.host/admin/typus_users?order_by=email&search=admin">Email </a></th>
-<th><a href="http://test.host/admin/typus_users?order_by=role&search=admin">Role </a></th>
-<th><a href="http://test.host/admin/typus_users?order_by=status&search=admin">Status </a></th>
-<th>&nbsp;</th>
-</tr>
-    HTML
+    expects(:render).once.with('admin/helpers/table_header', 
+      { :headers => [
+        '<a href="http://test.host/admin/typus_users?order_by=email&search=admin">Email </a>', 
+        '<a href="http://test.host/admin/typus_users?order_by=role&search=admin">Role </a>', 
+        '<a href="http://test.host/admin/typus_users?order_by=status&search=admin">Status </a>', 
+        '&nbsp;', 
+        '&nbsp;'
+    ]})
 
-    assert_equal expected, output
+    typus_table_header(TypusUser, fields)
+
+  end
+
+  def test_typus_table_header_when_user_cannot_edit_items
+
+    @current_user = mock()
+    @current_user.expects(:can?).with('edit', TypusUser).returns(false)
+    @current_user.expects(:can?).with('delete', TypusUser).returns(true)
+
+    fields = TypusUser.typus_fields_for(:list)
+
+    params = { :controller => 'admin/typus_users', :action => 'index' }
+    self.expects(:params).at_least_once.returns(params)
+
+    expects(:render).once.with('admin/helpers/table_header', 
+      { :headers => [
+        '<a href="http://test.host/admin/typus_users?order_by=email">Email </a>', 
+        '<a href="http://test.host/admin/typus_users?order_by=role">Role </a>', 
+        '<a href="http://test.host/admin/typus_users?order_by=status">Status </a>', 
+        '&nbsp;'
+    ]})
+
+    typus_table_header(TypusUser, fields)
 
   end
 
   def test_typus_table_header_when_user_cannot_delete_items
 
     @current_user = mock()
+    @current_user.expects(:can?).with('edit', TypusUser).returns(true)
     @current_user.expects(:can?).with('delete', TypusUser).returns(false)
 
     fields = TypusUser.typus_fields_for(:list)
@@ -98,22 +119,45 @@ class Admin::TableHelperTest < ActiveSupport::TestCase
     params = { :controller => 'admin/typus_users', :action => 'index' }
     self.expects(:params).at_least_once.returns(params)
 
-    output = typus_table_header(TypusUser, fields)
-    expected = <<-HTML
-<tr>
-<th><a href="http://test.host/admin/typus_users?order_by=email">Email </a></th>
-<th><a href="http://test.host/admin/typus_users?order_by=role">Role </a></th>
-<th><a href="http://test.host/admin/typus_users?order_by=status">Status </a></th>
-</tr>
-    HTML
+    expects(:render).once.with('admin/helpers/table_header', 
+      { :headers => [
+        '<a href="http://test.host/admin/typus_users?order_by=email">Email </a>', 
+        '<a href="http://test.host/admin/typus_users?order_by=role">Role </a>', 
+        '<a href="http://test.host/admin/typus_users?order_by=status">Status </a>', 
+        '&nbsp;'
+    ]})
 
-    assert_equal expected, output
+    typus_table_header(TypusUser, fields)
+
+  end
+
+  def test_typus_table_header_when_user_cannot_edit_items_with_params
+
+    @current_user = mock()
+    @current_user.expects(:can?).with('edit', TypusUser).returns(false)
+    @current_user.expects(:can?).with('delete', TypusUser).returns(true)
+
+    fields = TypusUser.typus_fields_for(:list)
+
+    params = { :controller => 'admin/typus_users', :action => 'index', :search => 'admin' }
+    self.expects(:params).at_least_once.returns(params)
+
+    expects(:render).once.with('admin/helpers/table_header', 
+      { :headers => [
+        '<a href="http://test.host/admin/typus_users?order_by=email&search=admin">Email </a>', 
+        '<a href="http://test.host/admin/typus_users?order_by=role&search=admin">Role </a>', 
+        '<a href="http://test.host/admin/typus_users?order_by=status&search=admin">Status </a>', 
+        '&nbsp;'
+    ]})
+
+    typus_table_header(TypusUser, fields)
 
   end
 
   def test_typus_table_header_when_user_cannot_delete_items_with_params
 
     @current_user = mock()
+    @current_user.expects(:can?).with('edit', TypusUser).returns(true)
     @current_user.expects(:can?).with('delete', TypusUser).returns(false)
 
     fields = TypusUser.typus_fields_for(:list)
@@ -121,16 +165,15 @@ class Admin::TableHelperTest < ActiveSupport::TestCase
     params = { :controller => 'admin/typus_users', :action => 'index', :search => 'admin' }
     self.expects(:params).at_least_once.returns(params)
 
-    output = typus_table_header(TypusUser, fields)
-    expected = <<-HTML
-<tr>
-<th><a href="http://test.host/admin/typus_users?order_by=email&search=admin">Email </a></th>
-<th><a href="http://test.host/admin/typus_users?order_by=role&search=admin">Role </a></th>
-<th><a href="http://test.host/admin/typus_users?order_by=status&search=admin">Status </a></th>
-</tr>
-    HTML
+    expects(:render).once.with('admin/helpers/table_header', 
+      { :headers => [
+        '<a href="http://test.host/admin/typus_users?order_by=email&search=admin">Email </a>', 
+        '<a href="http://test.host/admin/typus_users?order_by=role&search=admin">Role </a>', 
+        '<a href="http://test.host/admin/typus_users?order_by=status&search=admin">Status </a>', 
+        '&nbsp;'
+    ]})
 
-    assert_equal expected, output
+    typus_table_header(TypusUser, fields)
 
   end
 
