@@ -201,7 +201,10 @@ module Admin::FormHelper
       @items = @pager.page(params[:page])
 
       unless @items.empty?
-        options = { :back_to => "#{@back_to}##{field}", :resource => @resource[:self], :resource_id => @item.id }
+        options = { :back_to => "#{@back_to}##{field}", 
+          :resource => @resource[:self], 
+          :resource_id => @item.id, 
+          :field => field }
         html << build_list(model_to_relate, 
                            model_to_relate.typus_fields_for(:relationship), 
                            @items, 

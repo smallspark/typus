@@ -14,7 +14,7 @@ class Admin::PostsControllerTest < ActionController::TestCase
 
     assert_difference('post_.comments.count') do
       post :relate, { :id => post_.id, 
-                      :related => { :model => 'Comment', :id => comment.id } }
+                      :related => { :model => 'Comment', :field => 'comments', :id => comment.id } }
     end
 
     assert_response :redirect
@@ -23,7 +23,7 @@ class Admin::PostsControllerTest < ActionController::TestCase
 
     assert_difference('post_.comments.count', -1) do
       post :unrelate, { :id => post_.id, 
-                        :resource => 'Comment', :resource_id => comment.id }
+                        :resource => 'Comment', :field => 'comments', :resource_id => comment.id }
     end
 
     assert_response :redirect
@@ -44,7 +44,7 @@ class Admin::PostsControllerTest < ActionController::TestCase
 
     assert_difference('category.posts.count') do
       post :relate, { :id => post_.id, 
-                      :related => { :model => 'Category', :id => category.id } }
+                      :related => { :model => 'Category', :field => 'categories', :id => category.id } }
     end
 
     assert_response :redirect
@@ -53,12 +53,42 @@ class Admin::PostsControllerTest < ActionController::TestCase
 
     assert_difference('category.posts.count', -1) do
       post :unrelate, { :id => post_.id, 
-                        :resource => 'Category', :resource_id => category.id }
+                        :resource => 'Category', :field => 'categories', :resource_id => category.id }
     end
 
     assert_response :redirect
     assert_redirected_to @request.env['HTTP_REFERER']
     assert_equal "Category unrelated from Post.", flash[:success]
+
+  end
+
+  ##
+  # Post => has_many :photographs, :class_name => 'Picture'
+  ##
+
+  def test_should_relate_picture_with_post_and_then_unrelate
+
+    picture = pictures(:first)
+    post_ = posts(:published)
+    @request.env['HTTP_REFERER'] = "/admin/posts/edit/#{post_.id}#categories"
+
+    assert_difference('post_.photographs.count') do
+      post :relate, { :id => post_.id, 
+                      :related => { :model => 'Picture', :field => 'photographs', :id => picture.id } }
+    end
+
+    assert_response :redirect
+    assert_redirected_to @request.env['HTTP_REFERER']
+    assert_equal "Picture related to Post.", flash[:success]
+
+    assert_difference('post_.photographs.count', -1) do
+      post :unrelate, { :id => post_.id, 
+                        :resource => 'Picture', :field => 'photographs', :resource_id => picture.id }
+    end
+
+    assert_response :redirect
+    assert_redirected_to @request.env['HTTP_REFERER']
+    assert_equal "Picture unrelated from Post.", flash[:success]
 
   end
 
@@ -74,7 +104,7 @@ class Admin::PostsControllerTest < ActionController::TestCase
 
     assert_difference('post_.assets.count', -1) do
       get :unrelate, { :id => post_.id,  
-                       :resource => 'Asset', :resource_id => post_.assets.first.id }
+                       :resource => 'Asset', :field => 'assets', :resource_id => post_.assets.first.id }
     end
 
     assert_response :redirect

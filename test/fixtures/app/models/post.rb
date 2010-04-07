@@ -5,6 +5,7 @@ class Post < ActiveRecord::Base
   has_many :assets, :as => :resource, :dependent => :destroy
   has_many :comments
   has_many :views
+  has_many :photographs, :class_name => 'Picture'
   belongs_to :favorite_comment, :class_name => 'Comment'
 
   STATUS = %w( pending published unpublished )

@@ -72,7 +72,7 @@ module Admin::TableHelper
                                      :confirm => _("Remove entry?") if condition
         when 'edit'
           # If we are editing content, we can relate and unrelate always!
-          perform = link_to unrelate, { :action => 'unrelate', :id => params[:id], :resource => model, :resource_id => item.id }, 
+          perform = link_to unrelate, { :action => 'unrelate', :id => params[:id], :resource => model, :field => link_options[:field], :resource_id => item.id }, 
                                         :title => _("Unrelate"), 
                                         :confirm => _("Unrelate {{unrelate_model}} from {{unrelate_model_from}}?", 
                                                       :unrelate_model => model.typus_human_name, 
@@ -85,7 +85,7 @@ module Admin::TableHelper
           condition = if @resource[:class].typus_user_id? && @current_user.is_not_root?
                         @item.owned_by?(@current_user)
                       end
-          perform = link_to unrelate, { :action => 'unrelate', :id => params[:id], :resource => model, :resource_id => item.id }, 
+          perform = link_to unrelate, { :action => 'unrelate', :id => params[:id], :resource => model, :field => link_options[:field], :resource_id => item.id }, 
                                         :title => _("Unrelate"), 
                                         :confirm => _("Unrelate {{unrelate_model}} from {{unrelate_model_from}}?", 
                                                       :unrelate_model => model.typus_human_name, 

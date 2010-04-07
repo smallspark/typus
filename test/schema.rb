@@ -54,6 +54,7 @@ ActiveRecord::Schema.define do
     t.datetime :created_at
     t.datetime :updated_at
     t.integer :typus_user_id
+    t.integer :post_id
   end
 
   create_table :typus_users, :force => true do |t|
